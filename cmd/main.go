@@ -52,7 +52,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
+	ebiten.SetWindowSize(320, 240)
 	ebiten.SetWindowTitle("Hello, World!")
 	touchState := &ui.TouchState{
 		X:        0,
