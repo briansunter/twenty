@@ -3,7 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/briansunter/twenty/game"
+	"github.com/briansunter/twenty/pkg/game"
+	"github.com/briansunter/twenty/pkg/ui"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
@@ -37,7 +38,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	drawBoard(screen, g.state.Board)
+	ui.DrawBoard(screen, g.state.Board)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

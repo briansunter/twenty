@@ -1,15 +1,15 @@
-package main
+package ui
 
 import (
 	"fmt"
 	"image/color"
 
-	"github.com/briansunter/twenty/game"
+	"github.com/briansunter/twenty/pkg/game"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-func drawBoard(screen *ebiten.Image, board *game.Board) {
+func DrawBoard(screen *ebiten.Image, board *game.Board) {
 	for i, row := range board.GameBoard {
 		for j, _ := range row {
 			image := ebiten.NewImage(32, 32)
