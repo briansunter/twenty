@@ -57,7 +57,54 @@ type Game struct {
 	board *Board
 	seed  int64
 	state GameState
-	keys  []ebiten.Key
+}
+
+func (g *Game) mergeLeft() {
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 3; j++ {
+			if g.board.gameBoard[i][j] == g.board.gameBoard[i][j+1] {
+				g.board.gameBoard[i][j] = g.board.gameBoard[i][j] * 2
+				g.board.gameBoard[i][j+1] = 0
+				g.board.size--
+			}
+		}
+	}
+}
+
+func (g *Game) mergeRight() {
+	for i := 0; i < 4; i++ {
+		for j := 3; j > 0; j-- {
+			if g.board.gameBoard[i][j] == g.board.gameBoard[i][j-1] {
+				g.board.gameBoard[i][j] = g.board.gameBoard[i][j] * 2
+				g.board.gameBoard[i][j-1] = 0
+				g.board.size--
+			}
+		}
+	}
+}
+
+func (g *Game) mergeUp() {
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 3; j++ {
+			if g.board.gameBoard[j][i] == g.board.gameBoard[j+1][i] {
+				g.board.gameBoard[j][i] = g.board.gameBoard[j][i] * 2
+				g.board.gameBoard[j+1][i] = 0
+				g.board.size--
+			}
+		}
+	}
+}
+
+func (g *Game) mergeDown() {
+	for i := 0; i < 4; i++ {
+		for j := 3; j > 0; j-- {
+			if g.board.gameBoard[j][i] == g.board.gameBoard[j-1][i] {
+				g.board.gameBoard[j][i] = g.board.gameBoard[j][i] * 2
+				g.board.gameBoard[j-1][i] = 0
+				g.board.size--
+			}
+		}
+	}
 }
 
 func (g *Game) moveLeft() {
@@ -143,15 +190,27 @@ func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 		//move left
 		g.moveLeft()
+		g.mergeLeft()
+		g.moveLeft()
+		g.tryAddBlock()
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
 		//move right
 		g.moveRight()
+		g.mergeRight()
+		g.moveRight()
+		g.tryAddBlock()
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
 		//move up
 		g.moveUp()
+		g.mergeUp()
+		g.moveUp()
+		g.tryAddBlock()
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
 		//move down
 		g.moveDown()
+		g.mergeDown()
+		g.moveDown()
+		g.tryAddBlock()
 	} else if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		//add block
 		g.tryAddBlock()
@@ -178,10 +237,6 @@ func main() {
 	game.board = &Board{}
 	game.initialize()
 	game.tryAddBlock()
-	game.moveLeft()
-	game.moveRight()
-	game.moveDown()
-	game.moveUp()
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
