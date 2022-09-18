@@ -5,9 +5,11 @@ import (
 	"image/color"
 	"log"
 	"math/rand"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Board struct {
@@ -55,6 +57,7 @@ type Game struct {
 	board *Board
 	seed  int64
 	state GameState
+	keys  []ebiten.Key
 }
 
 func (g *Game) moveLeft() {
@@ -137,6 +140,26 @@ func (g *Game) tryAddBlock() {
 }
 
 func (g *Game) Update() error {
+	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+		//move left
+		g.moveLeft()
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+		//move right
+		g.moveRight()
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+		//move up
+		g.moveUp()
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+		//move down
+		g.moveDown()
+	} else if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		//add block
+		g.tryAddBlock()
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		//quit
+		os.Exit(0)
+	}
+
 	return nil
 }
 
