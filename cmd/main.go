@@ -1,30 +1,50 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/briansunter/twenty/pkg/game"
 	"github.com/briansunter/twenty/pkg/ui"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type Game struct {
 	state      *game.State
 	touchState *ui.TouchState
+	frameCount int
+	frameTouch int
+}
+
+func (g *Game) CanMove() bool {
+	return g.frameCount > g.frameTouch+25
 }
 
 func (g *Game) Update() error {
+	g.frameCount++
 	ui.HandleInput(g.state)
 	g.touchState.HandleTouches()
+	if g.touchState.Pan != nil && g.CanMove() {
+		g.frameTouch = g.frameCount
+
+		switch g.touchState.Pan.Direction {
+		case ui.Left:
+			g.state.MoveLeft()
+		case ui.Right:
+			g.state.MoveRight()
+		case ui.Up:
+			g.state.MoveUp()
+		case ui.Down:
+			g.state.MoveDown()
+
+		}
+	}
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	ui.DrawBoard(screen, g.state.Board)
 	//print touch state
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("x: %f, y: %f, zoom: %f", g.touchState.X, g.touchState.Y, g.touchState.Zoom))
+	// ebitenutil.DebugPrintAt(screen, fmt.Sprintf("panDirection: %v", g.currentMove), 20, 200)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -41,7 +61,6 @@ func main() {
 		TouchIDs: []ebiten.TouchID{},
 		Touches:  map[ebiten.TouchID]*ui.Touch{},
 		Pinch:    &ui.Pinch{},
-		Pan:      &ui.Pan{},
 		Taps:     []ui.Tap{},
 	}
 	game := &Game{

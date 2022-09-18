@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
@@ -43,6 +42,7 @@ type Pan struct {
 
 	prevX, prevY     int
 	originX, originY int
+	Direction        PanDirection
 }
 
 type Tap struct {
@@ -59,6 +59,15 @@ type TouchState struct {
 	Pan      *Pan
 	Taps     []Tap
 }
+
+type PanDirection int
+
+const (
+	Up PanDirection = iota
+	Down
+	Left
+	Right
+)
 
 func (g *TouchState) HandleTouches() error {
 	// Clear the previous frame's taps.
@@ -139,11 +148,12 @@ func (g *TouchState) HandleTouches() error {
 			if diff > 1 {
 				t.isPan = true
 				g.Pan = &Pan{
-					id:      id,
-					originX: t.originX,
-					originY: t.originY,
-					prevX:   t.originX,
-					prevY:   t.originY,
+					id:        id,
+					originX:   t.originX,
+					originY:   t.originY,
+					prevX:     t.originX,
+					prevY:     t.originY,
+					Direction: Up,
 				}
 			}
 		}
@@ -174,6 +184,20 @@ func (g *TouchState) HandleTouches() error {
 
 		g.X += float64(deltaX)
 		g.Y += float64(deltaY)
+
+		if math.Abs(float64(deltaX)) > math.Abs(float64(deltaY)) {
+			if deltaX > 0 {
+				g.Pan.Direction = Right
+			} else {
+				g.Pan.Direction = Left
+			}
+		} else {
+			if deltaY < 0 {
+				g.Pan.Direction = Up
+			} else {
+				g.Pan.Direction = Down
+			}
+		}
 	}
 
 	// If the user has tapped, then reset the Game's pan and zoom.
@@ -185,23 +209,23 @@ func (g *TouchState) HandleTouches() error {
 	return nil
 }
 
-func (g *TouchState) Draw(screen *ebiten.Image) {
-	op := &ebiten.DrawImageOptions{}
+// func (g *TouchState) Draw(screen *ebiten.Image) {
+// 	op := &ebiten.DrawImageOptions{}
 
-	// Apply zoom.
-	op.GeoM.Scale(g.Zoom, g.Zoom)
+// 	// Apply zoom.
+// 	op.GeoM.Scale(g.Zoom, g.Zoom)
 
-	// Apply pan.
-	op.GeoM.Translate(g.X, g.Y)
+// 	// Apply pan.
+// 	op.GeoM.Translate(g.X, g.Y)
 
-	// Center the image (corrected by the current zoom).
-	w, h := gophersImage.Size()
-	op.GeoM.Translate(float64(-w)/2*g.Zoom, float64(-h)/2*g.Zoom)
+// 	// Center the image (corrected by the current zoom).
+// 	w, h := gophersImage.Size()
+// 	op.GeoM.Translate(float64(-w)/2*g.Zoom, float64(-h)/2*g.Zoom)
 
-	screen.DrawImage(gophersImage, op)
+// 	screen.DrawImage(gophersImage, op)
 
-	ebitenutil.DebugPrint(screen, "Use a two finger pinch to zoom, swipe with one finger to pan, or tap to reset the view")
-}
+// 	ebitenutil.DebugPrint(screen, "Use a two finger pinch to zoom, swipe with one finger to pan, or tap to reset the view")
+// }
 
 func (g *TouchState) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
