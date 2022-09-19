@@ -70,7 +70,7 @@ func DrawBoard(screen *ebiten.Image, board *game.Board) {
 			op.GeoM.Translate(float64(i*76), float64(j*76))
 			// ebitenutil.DebugPrintAt(image, fmt.Sprintf("%d", board.GameBoard[j][i]), 8, 8)
 			value := board.GameBoard[j][i]
-			numX, numY := 16, 42
+			numX, numY := 16, 46
 			font := mplusNormalFont
 			if value > 1000 {
 				numX = 10
