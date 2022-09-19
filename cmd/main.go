@@ -42,24 +42,18 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	ui.DrawBoard(screen, g.state.Board)
-	//print touch state
-	// ebitenutil.DebugPrintAt(screen, fmt.Sprintf("panDirection: %v", g.currentMove), 20, 200)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 320, 240
+	return 320, 320
 }
 
 func main() {
-	ebiten.SetWindowSize(320, 240)
-	ebiten.SetWindowTitle("Hello, World!")
+	ebiten.SetWindowSize(320, 320)
+	ebiten.SetWindowTitle("2048")
 	game := &Game{
 		input: ui.NewInput(),
-		state: &game.State{
-			Board: &game.Board{},
-			Seed:  0,
-			State: 0,
-		},
+		state: game.NewState(),
 	}
 	game.state.Initialize()
 	if err := ebiten.RunGame(game); err != nil {

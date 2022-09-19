@@ -1,9 +1,6 @@
 package game
 
-import "math/rand"
-
 func (g *State) Initialize() {
-	rand.Seed(g.Seed)
 	g.Board.initialize()
 	g.Board.TryAddBlock()
 }
@@ -21,6 +18,13 @@ type State struct {
 	Board *Board
 	Seed  int64
 	State Status
+}
+
+func NewState() *State {
+	return &State{
+		Board: &Board{},
+		State: Loading,
+	}
 }
 
 func (g *State) MoveUp() {
