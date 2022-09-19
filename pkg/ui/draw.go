@@ -62,31 +62,43 @@ func init() {
 }
 
 func DrawBoard(screen *ebiten.Image, board *game.Board) {
+	background := ebiten.NewImage(320, 320)
+	background.Fill(color.RGBA{188, 172, 159, 255})
+	screen.DrawImage(background, nil)
 	for i, row := range board.GameBoard {
 		for j, _ := range row {
 			image := ebiten.NewImage(64, 64)
-			image.Fill(color.RGBA{100, 0, 0, 255})
+			bgImage := ebiten.NewImage(64, 64)
+			bgImage.Fill(color.RGBA{204, 192, 179, 255})
 			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(float64(i*76), float64(j*76))
+			screen.DrawImage(bgImage, op)
 			// ebitenutil.DebugPrintAt(image, fmt.Sprintf("%d", board.GameBoard[j][i]), 8, 8)
 			value := board.GameBoard[j][i]
 			numX, numY := 16, 46
 			font := mplusNormalFont
+			tileColor := color.RGBA{238, 225, 164, 255}
 			if value > 1000 {
 				numX = 10
 				numY = 32
 				font = mplusSmallestFont
+				tileColor = color.RGBA{247, 95, 60, 255}
 			} else if value > 100 {
 				numX = 12
 				numY = 38
 				font = mplusExtraSmallFont
+				tileColor = color.RGBA{247, 124, 95, 255}
 			} else if value > 10 {
 				numX = 10
 				numY = 42
 				font = mplusSmallFont
+				tileColor = color.RGBA{242, 178, 120, 255}
 			}
-			text.Draw(image, fmt.Sprintf("%d", board.GameBoard[j][i]), font, numX, numY, color.White)
-			screen.DrawImage(image, op)
+			image.Fill(tileColor)
+			if value > 0 {
+				text.Draw(image, fmt.Sprintf("%d", board.GameBoard[j][i]), font, numX, numY, color.White)
+				screen.DrawImage(image, op)
+			}
 		}
 	}
 }
