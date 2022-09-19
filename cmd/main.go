@@ -10,7 +10,7 @@ import (
 
 type Game struct {
 	state      *game.State
-	touchState *ui.TouchState
+	input      *ui.Input
 	frameCount int
 	frameTouch int
 }
@@ -21,21 +21,20 @@ func (g *Game) CanMove() bool {
 
 func (g *Game) Update() error {
 	g.frameCount++
-	ui.HandleInput(g.state)
-	g.touchState.HandleTouches()
-	if g.touchState.Pan != nil && g.CanMove() {
-		g.frameTouch = g.frameCount
+	g.input.Update()
 
-		switch g.touchState.Pan.Direction {
-		case ui.Left:
-			g.state.MoveLeft()
-		case ui.Right:
-			g.state.MoveRight()
-		case ui.Up:
-			g.state.MoveUp()
-		case ui.Down:
-			g.state.MoveDown()
-
+	if g.CanMove() {
+		if dir, ok := g.input.Dir(); ok {
+			switch dir {
+			case ui.DirUp:
+				g.state.MoveUp()
+			case ui.DirRight:
+				g.state.MoveRight()
+			case ui.DirDown:
+				g.state.MoveDown()
+			case ui.DirLeft:
+				g.state.MoveLeft()
+			}
 		}
 	}
 	return nil
@@ -54,17 +53,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	ebiten.SetWindowSize(320, 240)
 	ebiten.SetWindowTitle("Hello, World!")
-	touchState := &ui.TouchState{
-		X:        0,
-		Y:        0,
-		Zoom:     0,
-		TouchIDs: []ebiten.TouchID{},
-		Touches:  map[ebiten.TouchID]*ui.Touch{},
-		Pinch:    &ui.Pinch{},
-		Taps:     []ui.Tap{},
-	}
 	game := &Game{
-		touchState: touchState,
+		input: ui.NewInput(),
 		state: &game.State{
 			Board: &game.Board{},
 			Seed:  0,
