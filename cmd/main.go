@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	ebiten.SetWindowSize(320, 320)
+	ebiten.SetWindowSize(320, 420)
 	ebiten.SetWindowTitle("2048")
 	game := ui.NewGame()
 	game.Initialize()
