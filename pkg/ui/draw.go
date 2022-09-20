@@ -18,6 +18,7 @@ var (
 	mplusSmallFont      font.Face
 	mplusExtraSmallFont font.Face
 	mplusSmallestFont   font.Face
+	offset              = 12
 )
 
 func init() {
@@ -71,7 +72,7 @@ func DrawBoard(screen *ebiten.Image, board *game.Board) {
 			bgImage := ebiten.NewImage(64, 64)
 			bgImage.Fill(color.RGBA{204, 192, 179, 255})
 			op := &ebiten.DrawImageOptions{}
-			op.GeoM.Translate(float64(i*76), float64(j*76))
+			op.GeoM.Translate(float64(offset+i*76), float64(offset+j*76))
 			screen.DrawImage(bgImage, op)
 			// ebitenutil.DebugPrintAt(image, fmt.Sprintf("%d", board.GameBoard[j][i]), 8, 8)
 			value := board.GameBoard[j][i]
