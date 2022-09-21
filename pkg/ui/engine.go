@@ -1,13 +1,19 @@
 package ui
 
 import (
+	"image/color"
+
 	"github.com/briansunter/twenty/pkg/game"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/yohamta/furex/v2"
+	"github.com/yohamta/furex/v2/components"
 )
 
 type Game struct {
+	init       bool
 	state      *game.State
 	input      *Input
+	gameUI     *furex.View
 	frameCount int
 	frameTouch int
 }
@@ -18,6 +24,7 @@ func NewGame() *Game {
 		input: NewInput(),
 	}
 }
+
 func (g *Game) Initialize() {
 	g.state.Initialize()
 }
@@ -27,6 +34,12 @@ func (g *Game) CanMove() bool {
 }
 
 func (g *Game) Update() error {
+	if !g.init {
+		g.init = true
+		g.setupUI()
+	}
+	g.gameUI.Update()
+
 	g.frameCount++
 	g.input.Update()
 
@@ -49,8 +62,58 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	DrawBoard(screen, g.state.Board)
+	g.gameUI.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 320, 420
+}
+
+func (g *Game) setupUI() {
+	newButton := func() *furex.View {
+		return (&furex.View{
+			Width:   75,
+			Height:  50,
+			Handler: &components.Box{Color: color.Gray{}},
+			Justify: furex.JustifyCenter,
+		}).AddChild(
+			&furex.View{
+				Width:  75,
+				Height: 50,
+				Handler: &components.Button{
+					Text:    "New Game",
+					OnClick: func() { g.state.Initialize() },
+				},
+			},
+		)
+	}
+
+	g.gameUI = (&furex.View{
+		Width:      320,
+		Height:     420,
+		Direction:  furex.Column,
+		Justify:    furex.JustifySpaceBetween,
+		AlignItems: furex.AlignItemCenter,
+	}).AddChild(
+		(&furex.View{
+			Width:      320 - 20,
+			Height:     70,
+			Justify:    furex.JustifySpaceBetween,
+			AlignItems: furex.AlignItemCenter,
+		}).AddChild(
+			&furex.View{
+				Width:  80,
+				Height: 100,
+			},
+			&furex.View{
+				Width:  80,
+				Height: 60,
+			},
+			(&furex.View{
+				Width:       60,
+				Height:      40,
+				MarginRight: 20,
+			}).AddChild(newButton()),
+		),
+	)
 }
