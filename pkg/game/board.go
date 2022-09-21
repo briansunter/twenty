@@ -165,3 +165,13 @@ func (b *Board) TryAddBlock() {
 		// Game over
 	}
 }
+
+func (b *Board) CalculateScore() int {
+	score := 0
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 4; j++ {
+			score += b.GameBoard[i][j]
+		}
+	}
+	return score
+}

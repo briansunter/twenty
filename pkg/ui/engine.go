@@ -2,6 +2,7 @@ package ui
 
 import (
 	"image/color"
+	"strconv"
 
 	"github.com/briansunter/twenty/pkg/game"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -16,6 +17,7 @@ type Game struct {
 	gameUI     *furex.View
 	frameCount int
 	frameTouch int
+	lastScore  int
 }
 
 func NewGame() *Game {
@@ -37,6 +39,12 @@ func (g *Game) Update() error {
 	if !g.init {
 		g.init = true
 		g.setupUI()
+	}
+	currentScore := g.state.Board.CalculateScore()
+
+	if g.lastScore != currentScore {
+		g.lastScore = currentScore
+		g.init = false
 	}
 	g.gameUI.Update()
 
@@ -87,7 +95,6 @@ func (g *Game) setupUI() {
 			},
 		)
 	}
-
 	g.gameUI = (&furex.View{
 		Width:      320,
 		Height:     420,
@@ -96,14 +103,19 @@ func (g *Game) setupUI() {
 		AlignItems: furex.AlignItemCenter,
 	}).AddChild(
 		(&furex.View{
-			Width:      320 - 20,
-			Height:     70,
-			Justify:    furex.JustifySpaceBetween,
-			AlignItems: furex.AlignItemCenter,
+			Width:   320 - 20,
+			Height:  70,
+			Justify: furex.JustifySpaceBetween,
 		}).AddChild(
 			&furex.View{
 				Width:  80,
 				Height: 100,
+				Handler: &components.Button{
+					Text: strconv.Itoa(g.state.Board.CalculateScore()),
+					OnClick: func() {
+						print(strconv.Itoa(g.state.Board.CalculateScore()))
+					},
+				},
 			},
 			&furex.View{
 				Width:  80,
